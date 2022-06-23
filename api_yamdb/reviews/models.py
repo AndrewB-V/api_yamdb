@@ -56,7 +56,7 @@ class Title(models.Model):
     year = models.SmallIntegerField(
         verbose_name='Год выпуска',
         help_text='Введите год выпуска',
-        validators=[validate_year],  # TO DO вывести в отдельный файл
+        validators=[validate_year],
         blank=True
     )
     description = models.TextField(
