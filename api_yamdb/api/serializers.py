@@ -12,17 +12,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ('id', 'author', 'pub_date', 'score', 'text')
-
-
-class CommentSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
-        read_only=True,
-        slug_field='username'
-    )
-
-    class Meta:
-        model = Comment
-        fields = ('id', 'author', 'pub_date', 'text')
+        read_only_fields = ('id', 'author')
 
     def validate_score(self, value):
         if (0 <= value < 10):
@@ -37,3 +27,15 @@ class CommentSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Вы уже оставляли здесь отзыв!')
         return data
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username',
+        default=serializers.CurrentUserDefault()
+    )
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'author', 'pub_date', 'text')
