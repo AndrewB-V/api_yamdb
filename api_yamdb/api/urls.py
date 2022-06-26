@@ -8,7 +8,7 @@ from api.views import (
     TitleViewSet, CategoryViewSet,
     GenreViewSet, UsersViewSet)
 
-pp_name = 'api'
+app_name = 'api'
 
 router_v1 = routers.DefaultRouter()
 router_v1.register('genres', GenreViewSet, basename='genres')
