@@ -52,7 +52,7 @@ class UserAdmin(admin.ModelAdmin):
 
 
 @admin.register(Review)
-class ReviewAdmin(admin.ModelReview):
+class ReviewAdmin(admin.ModelAdmin):
     list_display = (
         'text',
         'score',
