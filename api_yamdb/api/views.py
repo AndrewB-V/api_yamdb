@@ -20,7 +20,8 @@ from api.serializers import (CategorySerializer, GenreSerializer,
                              SignUpSerializer, GetTokenSerializer,
                              UsersSerializer)
 from api.permissions import IsAdminOrReadOnly, IsAdmin, IsAuthorOrAdminOrModer
-from reviews.models import Category, Genre, Title, User, Comment, Review
+from reviews.models import Category, Genre, Title, Comment, Review
+from users.models import User
 
 
 class CategoryViewSet(CreateModelMixin, ListModelMixin,
