@@ -10,6 +10,13 @@ class UsersSerializer(serializers.ModelSerializer):
             'username', 'email', 'first_name',
             'last_name', 'bio', 'role')
 
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError(
+                'Имя пользователя не может быть - me'
+            )
+        return value
+
 
 class NotAdminSerializer(serializers.ModelSerializer):
     class Meta:
@@ -18,6 +25,13 @@ class NotAdminSerializer(serializers.ModelSerializer):
             'username', 'email', 'first_name',
             'last_name', 'bio', 'role')
         read_only_fields = ('role',)
+
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError(
+                'Имя пользователя не может быть - me'
+            )
+        return value
 
 
 class GetTokenSerializer(serializers.ModelSerializer):
@@ -112,10 +126,15 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field='username'
     )
+    title = serializers.SlugRelatedField(
+        slug_field='id',
+        many=False,
+        read_only=True
+    )
 
     class Meta:
         model = Review
-        fields = ('id', 'author', 'pub_date', 'score', 'text')
+        fields = ('id', 'author', 'pub_date', 'score', 'text', 'title')
         read_only_fields = ('id', 'author')
 
     def validate_score(self, value):
@@ -139,7 +158,12 @@ class CommentSerializer(serializers.ModelSerializer):
         slug_field='username',
         default=serializers.CurrentUserDefault()
     )
+    review = serializers.SlugRelatedField(
+        slug_field='text',
+        many=False,
+        read_only=True
+    )
 
     class Meta:
         model = Comment
-        fields = ('id', 'author', 'pub_date', 'text')
+        fields = ('id', 'author', 'pub_date', 'text', 'title')
