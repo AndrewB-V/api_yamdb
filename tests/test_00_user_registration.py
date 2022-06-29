@@ -223,6 +223,7 @@ class Test00UserRegistration:
             f'Проверьте, что при POST запросе `{self.url_token}` с валидным username, '
             f'но невалидным confirmation_code, возвращается статус {code}'
         )
+        print(response)
 
     @pytest.mark.django_db(transaction=True)
     def test_00_registration_me_username_restricted(self, client):
