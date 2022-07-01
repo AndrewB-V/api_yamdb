@@ -1,29 +1,52 @@
-from rest_framework import routers
-from rest_framework.authtoken import views
+from rest_framework.routers import DefaultRouter, SimpleRouter
 
 from django.urls import include, path
 
-from api.views import (CategoryViewSet, CommentViewSet, GenreViewSet,
-                       ReviewViewSet, TitleViewSet, UserViewSet, token_create,
-                       user_register)
+from .views import (AdminViewSet, APITokenCreate, APIUserCreate, APIUserData,
+                    CategoryViewSet, CommentViewSet, GenreViewSet,
+                    ReviewViewSet, TitleViewSet)
+
+router_v1 = SimpleRouter()
+router = DefaultRouter()
 
 app_name = 'api'
 
-router_v1 = routers.DefaultRouter()
-router_v1.register('genres', GenreViewSet, basename='genres')
-router_v1.register('titles', TitleViewSet, basename='titles')
-router_v1.register('categories', CategoryViewSet, basename='categories')
-router_v1.register(
-    r'titles/(?P<titles_id>\d+)/reviews', ReviewViewSet, basename='reviews'
+router.register(
+    'api/v1/users',
+    AdminViewSet
 )
 router_v1.register(
-    r'titles/(?P<titles_id>\d+)/reviews/(?P<reviews_id>\d+)/comments',
-    CommentViewSet, basename='comments'
+    'categories',
+    CategoryViewSet,
+    basename='сategories'
 )
-router_v1.register('users', UserViewSet, basename='users')
+router_v1.register(
+    'titles',
+    TitleViewSet,
+    basename='titles'
+)
+router_v1.register(
+    'genres',
+    GenreViewSet,
+    basename='genres'
+)
+router_v1.register(
+    r'titles/(?P<title_id>\d+)/reviews',
+    ReviewViewSet,
+    basename='reviews'
+)
+router_v1.register(
+    r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
+    CommentViewSet,
+    basename='comments'
+)
+
+VERSION_PARAM = 'api/v1'
 
 urlpatterns = [
-    path('v1/', include(router_v1.urls)),
-    path('v1/auth/signup/', user_register, name='register'),
-    path('v1/auth/token/', token_create, name='token'),
+    path(f'{VERSION_PARAM}/', include(router_v1.urls)),
+    path(f'{VERSION_PARAM}/auth/signup/', APIUserCreate.as_view()),
+    path(f'{VERSION_PARAM}/auth/token/', APITokenCreate.as_view()),
+    path(f'{VERSION_PARAM}/users/me/', APIUserData.as_view()),
+    path('', include(router.urls)),
 ]

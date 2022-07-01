@@ -5,14 +5,14 @@ from django.db import models
 class UserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **fields):
         if email is None:
-            raise TypeError('У пользователя должен быть email')
+            raise TypeError('Укажите email')
 
         if username is None:
-            raise TypeError('У пользователя должен быть username')
+            raise TypeError('Укажите username')
 
         if username == 'me':
             raise ValueError(
-                'Использовать имя (me) в качестве username запрещено.'
+                'Имя (me) в качестве username запрещено.'
             )
 
         user = self.model(
@@ -25,7 +25,7 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, username, email, password, **fields):
         if password is None:
-            raise TypeError('У суперпользователя должен быть пароль')
+            raise TypeError('Укажите пароль')
 
         user = self.create_user(username, email, password, **fields)
         user.is_superuser = True
@@ -37,48 +37,35 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    ROLES = [('user', 'Аутентифицированный пользователь'),
-             ('moderator', 'Модератор'),
-             ('admin', 'Администратор')]
+    ROLES = [('user', 'user'),
+             ('moderator', 'moderator'),
+             ('admin', 'admin')]
 
-    USER = 'user'
-    ADMIN = 'admin'
-    MODERATOR = 'moderator'
-
-    STAFF_ROLES = [ADMIN, MODERATOR]
+    username = models.CharField(
+        max_length=150,
+        unique=True
+    )
 
     email = models.EmailField(
         'Почта',
         unique=True
     )
+
     bio = models.TextField(
         'Биография',
         blank=True
     )
+
     role = models.CharField(
         'Роль',
-        max_length=100,
-        blank=True,
+        max_length=10,
         choices=ROLES,
-        default=USER
-    )
-    confirmation_code = models.CharField(
-        'Проверочный код',
-        max_length=100,
-        blank=True
+        default='user'
     )
 
-    @property
-    def is_admin(self):
-        return self.role == self.ADMIN
+    REQUIRED_FIELDS = ['email']
 
-    @property
-    def is_user(self):
-        return self.role == self.USER
-
-    @property
-    def is_moderator(self):
-        return self.role == self.MODERATOR
+    objects = UserManager()
 
     class Meta:
         ordering = ['id']
@@ -90,3 +77,11 @@ class User(AbstractUser):
         ]
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+
+    @property
+    def is_admin(self):
+        return self.role == 'admin'
+
+    @property
+    def is_moderator(self):
+        return self.role == 'moderator'
