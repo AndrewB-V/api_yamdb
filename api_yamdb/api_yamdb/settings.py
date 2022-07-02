@@ -23,7 +23,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_filters',
     'rest_framework',
-    'djoser',
     'rest_framework_simplejwt',
     'reviews',
     'api',
