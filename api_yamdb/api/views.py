@@ -111,6 +111,7 @@ class APITokenCreate(APIView):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+
 class AdminViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = AdminActionsSerializer
