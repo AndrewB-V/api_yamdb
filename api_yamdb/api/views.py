@@ -1,8 +1,8 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
-from rest_framework.decorators import permission_classes
+from rest_framework.decorators import permission_classes, action
 from rest_framework.filters import SearchFilter
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
@@ -117,24 +117,29 @@ class AdminViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
 
 
-class APIUserData(APIView):
+class APIUserData(viewsets.ModelViewSet):
+    permission_classes = (IsAdmin,)
+    queryset = User.objects.all()
     serializer_class = UserDataSerializer
-    permission_classes = (permissions.IsAuthenticated,)
 
-    def get(self, request):
-        user = get_object_or_404(User, username=request.user.username)
-        serializer = self.serializer_class(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def patch(self, request):
-        user = get_object_or_404(User, username=request.user.username)
-        serializer = self.serializer_class(
-            user,
-            data=request.data,
-            partial=True
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+    @action(
+        methods=['patch', 'get'],
+        detail=False,
+        permission_classes=IsAuthenticated,
+    )
+    def me(self, request):
+        user = request.user
+        if request.method == 'GET':
+            serializer = self.get_serializer(user)
+            return Response(serializer.data)
+        if request.method == 'PATCH':
+            serializer = self.get_serializer(
+                user,
+                data=request.data,
+                partial=user
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -142,18 +147,16 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthorOrAdminOrModer,)
     serializer_class = ReviewSerializer
 
+    def get_title(self):
+        title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
+        return title
+
     def perform_create(self, serializer):
-        title = get_object_or_404(
-            Title,
-            id=self.kwargs.get('title_id')
-        )
+        title = self.get_title()
         serializer.save(author=self.request.user, title=title)
 
     def get_queryset(self):
-        title = get_object_or_404(
-            Title,
-            id=self.kwargs.get('title_id')
-        )
+        title = self.get_title()
         return title.reviews.all()
 
 
@@ -161,16 +164,17 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthorOrAdminOrModer,)
     serializer_class = CommentSerializer
 
-    def perform_create(self, serializer):
+    def get_review(self):
         review = get_object_or_404(
             Review,
             id=self.kwargs.get('review_id')
         )
+        return review
+
+    def perform_create(self, serializer):
+        review = self.get_review()
         serializer.save(author=self.request.user, review=review)
 
     def get_queryset(self):
-        review = get_object_or_404(
-            Review,
-            id=self.kwargs.get('review_id')
-        )
+        review = self.get_review()
         return review.comments.all()
