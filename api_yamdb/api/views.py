@@ -2,12 +2,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import permission_classes
 from rest_framework.filters import SearchFilter
-from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
-                                   ListModelMixin)
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import GenericViewSet
 from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Review, Title
 from users.models import User
@@ -20,6 +17,7 @@ from django.shortcuts import get_object_or_404
 from api_yamdb.settings import EMAIL_HOST_USER
 
 from .filters import TitleFilter
+from .mixins import CreateListDestroyViewSet
 from .permissions import IsAdmin, IsAdminOrReadOnly, IsAuthorOrAdminOrModer
 from .serializers import (AdminActionsSerializer, CategorySerializer,
                           CommentSerializer, GenreSerializer,
@@ -28,8 +26,7 @@ from .serializers import (AdminActionsSerializer, CategorySerializer,
                           TitleSerializer, UserDataSerializer)
 
 
-class CategoryViewSet(CreateModelMixin, ListModelMixin,
-                      DestroyModelMixin, GenericViewSet):
+class CategoryViewSet(CreateListDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (IsAdminOrReadOnly,)
@@ -38,8 +35,7 @@ class CategoryViewSet(CreateModelMixin, ListModelMixin,
     search_fields = ('name',)
 
 
-class GenreViewSet(CreateModelMixin, ListModelMixin,
-                   DestroyModelMixin, GenericViewSet):
+class GenreViewSet(CreateListDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
