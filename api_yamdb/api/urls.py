@@ -11,17 +11,17 @@ router = DefaultRouter()
 
 app_name = 'api'
 
-# TODO К этому роутеру добавь users
+# TODO Отдельный роутер не нужен. Добавь к router_v1
+router.register(
+    'users',
+    APIUserData,
+    basename='users')
+
+# TODO См. дальше, APIUserData выпилишь и добавишь action к AdminViewSet
 router_v1.register(
     'users',
     AdminViewSet
 )
-
-# Отдельный роутер не нужен.
-# router.register(
-#     'users',
-#     APIUserData,
-#     basename='users')
 
 router_v1.register(
     'categories',
@@ -60,6 +60,6 @@ urlpatterns = [
     path(f'{VERSION_PARAM}/', include(router_v1.urls)),
     path(f'{VERSION_PARAM}/auth/', include(auth_patterns)),
     # TODO: тоже уже не нужно.
-    # path('', include(router.urls)),
+    path('', include(router.urls)),
 
 ]

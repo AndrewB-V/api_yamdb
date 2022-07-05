@@ -108,6 +108,7 @@ class APITokenCreate(APIView):
         )
 
 
+# TODO: В эту вьюху добавь action me
 class AdminViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = AdminActionsSerializer
@@ -115,28 +116,6 @@ class AdminViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
     lookup_field = 'username'
-
-    # TODO: В эту вьюху добавь action me
-    @action(
-        methods=['patch', 'get'],
-        detail=False,
-        permission_classes=(IsAuthenticated,),
-        serializer_class=UserDataSerializer,
-    )
-    def me(self, request):
-        user = request.user
-        if request.method == 'GET':
-            serializer = self.get_serializer(user)
-            return Response(serializer.data)
-        if request.method == 'PATCH':
-            serializer = self.get_serializer(
-                user,
-                data=request.data,
-                partial=user
-            )
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 # TODO: Выпилить.
@@ -149,7 +128,7 @@ class APIUserData(viewsets.ModelViewSet):
         methods=['patch', 'get'],
         detail=False,
         # TODO: будет ругаться, в permission_classes параметр должен
-        # быть либо кортеж, либо список. Посмотри примеры, они даже есть
+        # быть либо кортеж, либо список. Посмотри примеры, они есть
         # в твоем коде.
         permission_classes=IsAuthenticated,
     )
