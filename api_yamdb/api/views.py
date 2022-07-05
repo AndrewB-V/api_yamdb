@@ -2,7 +2,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import permission_classes, action
 from rest_framework.filters import SearchFilter
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
@@ -116,16 +116,12 @@ class AdminViewSet(viewsets.ModelViewSet):
     search_fields = ('username',)
     lookup_field = 'username'
 
-
-class APIUserData(viewsets.ModelViewSet):
-    permission_classes = (IsAdmin,)
-    queryset = User.objects.all()
-    serializer_class = UserDataSerializer
-
     @action(
         methods=['patch', 'get'],
         detail=False,
-        permission_classes=IsAuthenticated,
+        permission_classes=[permissions.IsAuthenticated],
+        serializer_class=UserDataSerializer
+
     )
     def me(self, request):
         user = request.user

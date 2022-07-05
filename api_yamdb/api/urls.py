@@ -1,25 +1,19 @@
-from rest_framework.routers import DefaultRouter, SimpleRouter
+from rest_framework.routers import SimpleRouter
 
 from django.urls import include, path
 
 from .views import (AdminViewSet, APITokenCreate, APIUserCreate,
                     CategoryViewSet, CommentViewSet, GenreViewSet,
-                    ReviewViewSet, TitleViewSet, APIUserData)
+                    ReviewViewSet, TitleViewSet)
 
 router_v1 = SimpleRouter()
-router = DefaultRouter()
 
 app_name = 'api'
 
-router.register(
-    'api/v1/users',
+router_v1.register(
+    'users',
     AdminViewSet
 )
-
-router.register(
-    'users',
-    APIUserData,
-    basename='users')
 
 router_v1.register(
     'categories',
@@ -57,6 +51,4 @@ auth_patterns = [
 urlpatterns = [
     path(f'{VERSION_PARAM}/', include(router_v1.urls)),
     path(f'{VERSION_PARAM}/auth/', include(auth_patterns)),
-    path('', include(router.urls)),
-
 ]
